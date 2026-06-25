@@ -1,6 +1,5 @@
 /*jslint browser */
-/*global describe, it */
-
+/*linted*/
 import Othello from "../othello.js";
 import R from "../ramda.js";
 
@@ -11,7 +10,11 @@ const {
     getWinner,
     initializeGame
 } = Othello;
-
+/* 1.game set-up */
+/**
+ * Returns a string representation of a board.
+ * Empty cells are shown as dots, tokens as their first character.
+ */
 const display_board = function (board) {
     return "\n" + board.map(function (row) {
         return row.map(function (cell) {
@@ -24,13 +27,16 @@ const display_board = function (board) {
     }).join("\n");
 };
 
+
 const throw_if_invalid = function (state) {
     const board = state.board;
 
     if (
         !Array.isArray(board) ||
         board.length !== 8 ||
-        !R.all((row) => Array.isArray(row) && row.length === 8, board)
+        !R.all(function (row) {
+            return Array.isArray(row) && row.length === 8;
+        }, board)
     ) {
         throw new Error(
             "The board structure is not a valid 8x8 grid:" +
@@ -40,14 +46,18 @@ const throw_if_invalid = function (state) {
 
     const validTokens = ["red", "blue", ""];
     const flattenedCells = R.flatten(board);
-    if (!R.all((cell) => validTokens.includes(cell), flattenedCells)) {
+    if (!R.all(function (cell) {
+        return validTokens.includes(cell);
+    }, flattenedCells)) {
         throw new Error(
             "The board contains invalid tokens:" +
             display_board(board)
         );
     }
 
-    const countTokens = (color) => R.count(R.equals(color), flattenedCells);
+    const countTokens = function (color) {
+        return R.count(R.equals(color), flattenedCells);
+    };
     const redCount = countTokens("red");
     const blueCount = countTokens("blue");
     const total = redCount + blueCount;
@@ -60,9 +70,13 @@ const throw_if_invalid = function (state) {
     }
 };
 
-// Helper to expand compressed matrix blocks safely under 80 characters
+/**
+ * Expands a compressed matrix of single-letter tokens into
+ * Othello board string values. Maps "r" to "red", "b" to "blue",
+ * and "e" to "".
+ */
 const expandBoard = function (matrix) {
-    const tokenMap = {b: "blue", e: "", r: "red"};
+    const tokenMap = {"b": "blue", "e": "", "r": "red"};
     return matrix.map(function (row) {
         return row.map(function (cell) {
             return tokenMap[cell];
@@ -71,12 +85,12 @@ const expandBoard = function (matrix) {
 };
 
 describe("Initial Starting Configuration", function () {
-    it("The initial board state must pass structural validations", function () {
+    it("An initial board state must pass structural validations", function () {
         const initialState = initializeGame();
         throw_if_invalid(initialState);
     });
 
-    it("The game must start with exactly 4 tokens in the center", function () {
+    it("Initial board must have 4 tokens crossed in the center", function () {
         const initialState = initializeGame();
         const board = initialState.board;
         if (
@@ -92,7 +106,7 @@ describe("Initial Starting Configuration", function () {
         }
     });
 
-    it("Player Red must be assigned the opening turn", function () {
+    it("An initial board must assign red the opening turn", function () {
         const initialState = initializeGame();
         if (initialState.currentPlayer !== "red") {
             throw new Error(
@@ -102,7 +116,7 @@ describe("Initial Starting Configuration", function () {
         }
     });
 
-    it("The initial status must be Active", function () {
+    it("An initial board must have status Active", function () {
         const initialState = initializeGame();
         if (initialState.status !== "Active") {
             throw new Error(
@@ -112,22 +126,26 @@ describe("Initial Starting Configuration", function () {
         }
     });
 
-    it("The initial board must have 2 red and 2 blue pieces", function () {
+    it("An initial board must have 2 red and 2 blue pieces", function () {
         const initialState = initializeGame();
         const scores = getScores(initialState.board);
         if (scores.red !== 2 || scores.blue !== 2) {
             throw new Error(
                 "Expected 2 red and 2 blue pieces on initial board, " +
-                `instead got red: ${scores.red}, blue: ${scores.blue}`
+                "instead got red: " + scores.red +
+                ", blue: " + scores.blue
             );
         }
     });
 });
-
+/* 2.Placing and flipping tokens */
 describe("Valid Move and State Transitions", function () {
     it(
-        "Given a running game, when a valid move is made, " +
-        "then the state updates and turn passes.",
+        "Given a running game, " +
+        "when a valid move is made, " +
+        "then the placed square is filled, " +
+        "sandwiched pieces are flipped, " +
+        "and the turn passes to the opponent.",
         function () {
             const stateBeforeMove = initializeGame();
             const stateAfterMove = applyMove(stateBeforeMove, [2, 4]);
@@ -167,21 +185,22 @@ describe("Valid Move and State Transitions", function () {
 
             if (totalAfter !== totalBefore + 1) {
                 throw new Error(
-                    "Total piece count should increase by 1 after move. " +
-                    `Before: ${totalBefore}, After: ${totalAfter}`
+                    "Total piece count should increase by 1 after a move. " +
+                    "Before: " + totalBefore + ", After: " + totalAfter
                 );
             }
         }
     );
 
     it(
-        "Given an illegal move, then the move is rejected " +
-        "and the original state object is returned unchanged.",
+        "Given an illegal empty square with no captures, " +
+        "when a move is attempted, " +
+        "then the original state object is returned unchanged.",
         function () {
             const state = initializeGame();
-            const invalidStateChange = applyMove(state, [0, 0]);
+            const unchanged = applyMove(state, [0, 0]);
 
-            if (invalidStateChange !== state) {
+            if (unchanged !== state) {
                 throw new Error(
                     "Illegal move did not return original state object."
                 );
@@ -190,13 +209,14 @@ describe("Valid Move and State Transitions", function () {
     );
 
     it(
-        "Given an occupied target square, then the move is rejected " +
-        "and original state object is returned unchanged.",
+        "Given an occupied square, " +
+        "when a move is attempted, " +
+        "then the original state object is returned unchanged.",
         function () {
             const state = initializeGame();
-            const invalidStateChange = applyMove(state, [3, 3]);
+            const unchanged = applyMove(state, [3, 3]);
 
-            if (invalidStateChange !== state) {
+            if (unchanged !== state) {
                 throw new Error(
                     "Move onto occupied square did not return original state."
                 );
@@ -205,7 +225,8 @@ describe("Valid Move and State Transitions", function () {
     );
 
     it(
-        "Given a valid move is made, then the resulting state is immutable.",
+        "Given a valid move is made, " +
+        "then the resulting game state must be immutable.",
         function () {
             const state = initializeGame();
             const stateAfter = applyMove(state, [2, 4]);
@@ -224,7 +245,7 @@ describe("Valid Move and State Transitions", function () {
         }
     );
 });
-
+/* 3. End game conditions*/
 describe("Endgame Terminal Conditions", function () {
     it(
         "Given a completely filled board, " +
@@ -251,8 +272,9 @@ describe("Endgame Terminal Conditions", function () {
     );
 
     it(
-        "Given a board with no legal moves, " +
-        "then valid move lists must be empty for both players.",
+        "Given a board where neither player has legal moves, " +
+        "then valid move lists must be empty for both players, " +
+        "even when empty squares remain on the board.",
         function () {
             const blockedBoard = expandBoard([
                 ["r", "r", "r", "r", "r", "r", "r", "r"],
@@ -285,7 +307,8 @@ describe("Endgame Terminal Conditions", function () {
     );
 
     it(
-        "Given an equal piece tie board, then getWinner must return draw.",
+        "Given a board with equal pieces for both players, " +
+        "then getWinner must return draw.",
         function () {
             const drawBoard = expandBoard([
                 ["r", "r", "r", "r", "b", "b", "b", "b"],

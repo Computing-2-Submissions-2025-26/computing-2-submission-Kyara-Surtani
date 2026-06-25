@@ -1,14 +1,16 @@
 /*1. Variables & Global Styles */
 :root {
-    --bg-color: #231f1e;       
-    --panel-bg: #EFE9DC;     
-    --text-light: #ece9df;  
-    --text-dark: #231f1e;   
-    --player-red: #d12229;  
-    --player-blue: #3a75c4;  
+    --bg-color: #231f1e;
+    --panel-bg: #EFE9DC;
+    --text-light: #ece9df;
+    --text-dark: #231f1e;
+    --player-red: #d12229;
+    --player-blue: #3a75c4;
     --blue-tint: rgba(51, 102, 255, 0.15);
     --red-tint: rgba(255, 51, 51, 0.15);
-    --shadow:rgba(0, 0, 0, 0.5);
+    --shadow: rgba(0, 0, 0, 0.5);
+    --bg-lines: rgba(236, 233, 223, 0.15);
+    --hint: rgba(255, 255, 255, 0.6);
     --font-family: 'Press Start 2P', monospace;
 }
 
@@ -45,14 +47,14 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px; 
-    margin: -20px -20px 20px -20px; 
+    padding: 15px 40px;
+    margin: -20px -20px 20px -20px;
 }
 
 /* Container layout constraints */
 .controls {
     display: flex;
-    gap: 16px; 
+    gap: 40px;
     align-items: center;
 }
 
@@ -62,15 +64,16 @@ header {
     align-items: center;
     justify-content: center;
     padding: 0;
-    background: none;    
-    border: none;        
+    background: none;
+    border: none;
     cursor: pointer;
     transition: transform 0.1s ease;
 }
 
 /* Click feedback mechanics */
 .controls button:active {
-    transform: scale(0.9); /* Subtle click spring effect */
+    transform: scale(0.9);
+    /* click spring effect */
 }
 
 
@@ -91,14 +94,10 @@ header {
     height: 38px;
 }
 
-.menu {
-    width: 38px;
-    height: 38px;
-}
 
 /* hover state for buttons */
 .controls button:hover .control-icon {
-    opacity: 0.7; 
+    opacity: 0.7;
 }
 
 
@@ -112,7 +111,8 @@ header {
 .game-info {
     text-align: center;
     font-size: 1.2rem;
-    margin-bottom: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
     letter-spacing: 2px;
 }
 
@@ -131,7 +131,8 @@ header {
     flex-direction: column;
     align-items: center;
     height: 100%;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 10px;
     padding: 10px 0;
 }
 
@@ -144,52 +145,57 @@ header {
 
 /* Score Badges */
 .score {
-    width: 80px;
-    height: 80px;
-    border-radius: 0%; /* Forces the container to be a sharp square */
-    background-color: var(--panel-bg); /* This creates the beige square */
-    
+    width: 100px;
+    height: 100px;
+    border-radius: 0%;
+    background-color: var(--panel-bg);
+
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    font-size: 1.5rem;
+
+    font-size: 2rem;
     font-weight: bold;
-    color: var(--panel-bg); /* Keeps the score text white so it pops on red/blue */
+    color: var(--panel-bg);
+    /* Keeps the score text white */
     position: relative;
-    z-index: 1; /* Establishes a stacking context layer */
+    z-index: 1;
+    /* Establishes a stacking context layer */
 }
 
 /* inner colored circle for score badges*/
 .score::before {
     content: "";
     position: absolute;
-    
 
-    width: 64px; 
-    height: 64px;
-    
+
+    width: 80px;
+    height: 80px;
+
     border-radius: 50%;
-    z-index: -1; /* Pushes the colored circle behind the text numbers */
+    z-index: -1;
+    /* Pushes the colored circle behind the text numbers */
 }
 
 /* colored circle for score badges*/
-.score.red::before { 
-    background-color: var(--player-red); 
+.score.red::before {
+    background-color: var(--player-red);
 }
 
-.score.blue::before { 
-    background-color: var(--player-blue); 
+.score.blue::before {
+    background-color: var(--player-blue);
 }
+
 /* Decorative Stack of Counter Bars */
 .disc-stack {
     display: flex;
-    flex-direction: column-reverse; /* Allows items to clear from top-down easily */
+    flex-direction: column-reverse;
+    /* Allows items to clear from top-down easily */
     gap: 8px;
-    width: 70px;
-    flex-grow: 1;
-    margin: 20px 0;
-    justify-content: center;
+    width: 90px;
+    margin: 20px 0 10px 0;
+    justify-content: flex-start;
+    height: 384px;
 }
 
 /* Individual discs in the stack */
@@ -198,27 +204,21 @@ header {
     width: 100%;
     border-radius: 2px;
 }
-.red-stack div { background-color: var(--player-red); }
-.blue-stack div { background-color: var(--player-blue); }
 
-/* Retro Icon Buttons */-- needs to be replaced with svgs
-.player-panel button {
-    background-color: var(--panel-bg);
-    color: var(--text-dark);
-    border: none;
-    padding: 8px 16px;
-    font-family: var(--font-family);
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    font-size: 1rem;
+.red-stack div {
+    background-color: var(--player-red);
+}
+
+.blue-stack div {
+    background-color: var(--player-blue);
 }
 
 
+
 .game {
-    background-image: 
-        linear-gradient(to right, rgba(236, 233, 223, 0.15) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(236, 233, 223, 0.15) 1px, transparent 1px);
+    background-image:
+        linear-gradient(to right, var(--bg-lines) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--bg-lines) 1px, transparent 1px);
     background-size: calc(480px / 8) calc(480px / 8);
     background-position: 38px 48px;
 }
@@ -228,7 +228,7 @@ header {
 
 /* Individual grid squares */
 .square {
-    background-color:var(--bg-color); 
+    background-color: var(--bg-color);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -239,46 +239,53 @@ header {
 .disc {
     width: 65%;
     height: 65%;
-    border-radius: 0; 
-    rotate:45deg;
+    border-radius: 0;
+    rotate: 45deg;
 
     transition: background-color 0s 0.2s;
 }
+
 /* colours for each player's dics*/
 .disc.red {
-    background-color: var(--player-red); 
+    background-color: var(--player-red);
 }
 
 .disc.blue {
-    background-color: var(--player-blue); 
+    background-color: var(--player-blue);
 }
+
 .disc.flip-anim {
-    
+
     animation: true-3d-flip 0.4s ease-in-out forwards;
 }
+
 /*animates 3d flipping */
 @keyframes true-3d-flip {
-    0% { 
-        transform: rotateY(0deg) scale(1); 
+    0% {
+        transform: rotateY(0deg) scale(1);
     }
-    50% { 
-        transform: rotateY(90deg) scale(1.15); 
-    } 
-    100% { 
-        
-        transform: rotateY(0deg) scale(1); 
+
+    50% {
+        transform: rotateY(90deg) scale(1.15);
+    }
+
+    100% {
+
+        transform: rotateY(0deg) scale(1);
     }
 }
+
 /*  6. Uneven Extended Grid Lines */
 
 /* The new wrapper we added to the HTML */
 .extended-game-field {
     position: relative;
-    width: 480px; 
+    width: 480px;
     height: 480px;
     margin: 0 auto;
 
 }
+
 /* Makes existing board transparent so lines show behind it */
 .game-board {
     display: grid;
@@ -287,9 +294,10 @@ header {
     width: 100%;
     height: 100%;
     position: relative;
-    z-index: 10; /* Keeps pieces clickable above the lines */
+    z-index: 10;
+    /* Keeps pieces clickable above the lines */
     gap: 2px;
-  
+
 }
 
 /* Base styling for all vertical lines */
@@ -297,9 +305,10 @@ header {
     position: absolute;
     width: 2px;
     /* Use a dashed border to get the retro look */
-    border-left: 2px dashed var(--panel-bg); 
-    top: -20px; 
-    height: calc(100% + 40px); /* Extends 40px top and bottom */
+    border-left: 2px dashed var(--panel-bg);
+    top: -20px;
+    height: calc(100% + 40px);
+    /* Extends 40px top and bottom */
     z-index: 1;
 }
 
@@ -309,7 +318,8 @@ header {
     height: 2px;
     border-top: 2px dashed var(--panel-bg);
     left: -20px;
-    width: calc(100% + 40px); /* Extends 40px left and right */
+    width: calc(100% + 40px);
+    /* Extends 40px left and right */
     z-index: 1;
 }
 
@@ -319,15 +329,16 @@ header {
 /* The dark overlay that covers the screen */
 .modal {
     position: fixed;
-    top: 0; 
-    left: 0; 
-    width: 100vw; 
+    top: 0;
+    left: 0;
+    width: 100vw;
     height: 100vh;
-    background-color: var(--bg-color); 
+    background-color: var(--bg-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100; /* Ensures it sits on top of EVERYTHING */
+    z-index: 100;
+    /* Ensures it sits on top of EVERYTHING */
     opacity: 1;
     transition: opacity 0.3s ease;
 }
@@ -335,7 +346,8 @@ header {
 /* The class JS will use to hide the modal during gameplay */
 .modal.hidden {
     opacity: 0;
-    pointer-events: none; /* Prevents clicking invisible buttons */
+    pointer-events: none;
+    /* Prevents clicking invisible buttons */
 }
 
 /* The actual pop-up box */
@@ -346,7 +358,7 @@ header {
     border: 4px solid var(--text-dark);
     text-align: center;
     box-shadow: 0 10px 30px var(--shadow);
-    
+
     /* A quick scale animation when it appears */
     transform: scale(1);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -371,8 +383,13 @@ header {
     font-weight: bold;
 }
 
-.red-score-modal { color: var(--player-red); }
-.blue-score-modal { color: var(--player-blue); }
+.red-score-modal {
+    color: var(--player-red);
+}
+
+.blue-score-modal {
+    color: var(--player-blue);
+}
 
 #modal-restart-btn {
     background-color: var(--text-dark);
@@ -384,16 +401,16 @@ header {
     cursor: pointer;
     text-transform: uppercase;
 
-
     transition: transform 0.2s, background-color 0.2s;
-    
-    
-    position: relative; 
+
+
+    position: relative;
     z-index: 9999;
 }
+
 #modal-restart-btn:hover {
     transform: scale(1.05);
-    background-color: #000;
+    background-color: --bg-color;
 }
 
 
@@ -408,23 +425,31 @@ header {
     position: absolute;
     width: 14px;
     height: 14px;
-    background-color: rgba(255, 255, 255, 0.6); /* Semi-transparent white */
+    background-color: var(--hint);
     border-radius: 0%;
-    
-    
+
+
     /* Perfect center positioning */
     top: 50%;
-    left: 50%-14px;
-    transform: translate(-50%, -50%);
-    rotate:45deg;
-    
-    pointer-events: none; /* Prevents the circle node from interfering with box clicks */
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+
+
+    pointer-events: none;
+    /* Prevents the circle node from interfering with box clicks */
     animation: fadeInHint 0.2s ease-out;
 }
 
 @keyframes fadeInHint {
-    from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
 }
 
 
@@ -433,18 +458,20 @@ header {
     outline-style: solid;
     outline-width: 3px;
     outline-offset: -3px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 0 10px var(--shadow);
     cursor: pointer;
 }
 
 /*keyboard navigation for red player */
 #game-board[data-current-player="red"] .square:focus-visible {
-    outline-color: var(--player-red); 
-    background-color: var(--red-tint); /* tints highlighted box red */
+    outline-color: var(--player-red);
+    background-color: var(--red-tint);
+    /* tints highlighted box red */
 }
 
 /*keyboard navigation for blue player */
 #game-board[data-current-player="blue"] .square:focus-visible {
-    outline-color:var(--player-blue); 
-    background-color:var(--blue-tint); /*tints highlighted box blue */
+    outline-color: var(--player-blue);
+    background-color: var(--blue-tint);
+    /*tints highlighted box blue */
 }

@@ -2,6 +2,7 @@
 <!-- They can all be removed for your apps -->
 <!doctype html>
 <html lang="en-gb">
+
 <head>
     <meta charset="utf-8">
     <title>Othello</title>
@@ -10,65 +11,60 @@
     <link rel="icon" href="./assets/favicon.png">
     <script type="module" src="main.js"></script>
 </head>
+
 <body>
 
-<div class="game-container">
+    <div class="game-container">
 
-    <header>
-        <div class="logo">OTHELLO</div>
-        <div class="controls">
-            <button class="show-moves">
-                <img src="assets/Vector 11.svg" class="control-icon eye" alt="" />
-            </button>
-            <button class="restart">
-                <img src="assets/Vector 12.svg" class="control-icon restart" alt="" />
-            </button>
-            <button class="menu">
-                <img src="assets/Vector 13.svg" class="control-icon menu" alt="" />
-            </button>
+        <header>
+            <div class="logo">OTHELLO</div>
+            <div class="controls">
+                <button class="show-moves">
+                    <img src="assets/Vector 27.svg" class="control-icon eye" alt="" />
+                </button>
+                <button class="restart">
+                    <img src="assets/Vector 12.svg" class="control-icon restart" alt="" />
+                </button>
+
+            </div>
+        </header>
+        <div class="game-info">
+            <div class="current player">Player 1's Turn</div>
         </div>
-    </header>
-    <div class="game-info">
-        <div class="current player">Player 1's Turn</div>
-    </div>
 
 
-    <main class="game">
+        <main class="game">
 
-        <section class="player-panel left">
-            <div class="score red" id="red-score">2</div>
-            <div class="disc-stack red-stack"></div>
-            <button>Icon</button>
-            <h2>Player 1</h2>
-        </section>
-
-        <div class="extended-game-field" id="grid-container">
-            <section class="game-board" id="game-board" tabindex="0">
+            <section class="player-panel left">
+                <div class="score red" id="red-score">2</div>
+                <div class="disc-stack red-stack"></div>
             </section>
-        </div>
 
-        <section class="player-panel right">
-            <div class="score blue" id="blue-score">2</div>
-            <div class="disc-stack blue-stack"></div>
-            <button>Icon</button>
-            <h2>Player 2</h2>
-        </section>
+            <div class="extended-game-field" id="grid-container">
+                <section class="game-board" id="game-board" tabindex="0">
+                </section>
+            </div>
 
-    </main>
+            <section class="player-panel right">
+                <div class="score blue" id="blue-score">2</div>
+                <div class="disc-stack blue-stack"></div>
+            </section>
 
-</div>
+        </main>
 
-<div id="game-over-modal" class="modal hidden">
-    <div class="modal-content">
-        <h1 id="winner-text">Player Wins!</h1>
-        <div class="modal-scores">
-            <div class="final-score red-score-modal">Red: <span id="modal-red-score">0</span></div>
-            <div class="final-score blue-score-modal">Blue: <span id="modal-blue-score">0</span></div>
-        </div>
-        <button id="modal-restart-btn">Play Again</button>
     </div>
-</div>
+
+    <div id="game-over-modal" class="modal hidden">
+        <div class="modal-content">
+            <h1 id="winner-text">Player Wins!</h1>
+            <div class="modal-scores">
+                <div class="final-score red-score-modal">Red: <span id="modal-red-score">0</span></div>
+                <div class="final-score blue-score-modal">Blue: <span id="modal-blue-score">0</span></div>
+            </div>
+            <button id="modal-restart-btn">Play Again</button>
+        </div>
+    </div>
 
 </body>
-</html>
 
+</html>

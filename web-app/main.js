@@ -1,37 +1,60 @@
 /*jslint browser */
-/*import R from "./ramda.js";*/
+
+/*linted
+ * main.js
+ * Handles all DOM interaction, rendering, and user input for Othello.
+ * All game logic is delegated to the Othello engine module.
+ */
+
 import OthelloEngine from "./othello.js";
 
-// Destructure the functions out from the frozen default engine object
+/* Pull the functions we need out of the engine. */
 const {
-    initializeGame,
     applyMove,
+    findAllValidMoves,
     getScores,
     getWinner,
-    findAllValidMoves
+    initializeGame
 } = OthelloEngine;
 
 /* 1. HTML Element Selectors */
+
+/* The main grid container where squares are rendered. */
 const boardContainer = document.getElementById("game-board");
+
+/* Score display elements for each player. */
 const redScoreEl = document.getElementById("red-score");
 const blueScoreEl = document.getElementById("blue-score");
+
+/* Shows whose turn it currently is above the board. */
 const playerTurnEl = document.querySelector(".current.player");
 
+/* Decorative disc stack bars shown in each player panel. */
 const redStackEl = document.querySelector(".red-stack");
 const blueStackEl = document.querySelector(".blue-stack");
+
+/* Restart button in the header. */
 const restartBtn = document.querySelector(".restart");
+
+/* Button that highlights all valid moves for the current player. */
 const showMovesBtn = document.querySelector(".show-moves");
 
+/* Game over modal and its inner elements. */
 const modal = document.getElementById("game-over-modal");
 const modalWinnerText = document.getElementById("winner-text");
 const modalRedScore = document.getElementById("modal-red-score");
 const modalBlueScore = document.getElementById("modal-blue-score");
 const modalRestartBtn = document.getElementById("modal-restart-btn");
 
-/* 2. Initial Game State*/
+/* 2. Game State*/
+
+/* The live game state. Replaced with a new object after each valid move. */
 let gameState = initializeGame();
 
 /* 3. Rendering Functions */
+
+/* Draws 9 vertical and 9 horizontal lines behind the board to form
+   the visual 8x8 grid. Called once on page load. */
 function renderGridLines() {
     const container = document.getElementById("grid-container");
     const board = document.getElementById("game-board");
@@ -47,6 +70,7 @@ function renderGridLines() {
     });
 }
 
+/* Removes all valid move hint dots and styling from the board. */
 function clearMoveHighlights() {
     const highlightedSquares = document.querySelectorAll(".square.hint");
     highlightedSquares.forEach(function (square) {
@@ -58,9 +82,11 @@ function clearMoveHighlights() {
     });
 }
 
-// Runs ONCE to create the 64 empty physical squares
+/* Creates the 64 clickable squares in the DOM.
+   Each square gets ARIA labels and keyboard tab access.
+   Called once on page load. */
 function createBoardGrid() {
-    boardContainer.innerHTML = ""; // Clear it once
+    boardContainer.innerHTML = "";
 
     Array.from({length: 8}).forEach(function (ignore, row) {
         Array.from({length: 8}).forEach(function (ignore, col) {
@@ -70,13 +96,12 @@ function createBoardGrid() {
             square.dataset.row = row;
             square.dataset.col = col;
 
-            // ACCESSIBILITY: Adds element to natural keyboard tab flow
             square.tabIndex = 0;
-
-            // ACCESSIBILITY: Identifies element as a button
             square.setAttribute("role", "button");
 
-            const labelText = `Square Row ${row + 1}, Column ${col + 1}`;
+            const labelText = (
+                `Square Row ${row + 1}, Column ${col + 1}`
+            );
             square.setAttribute("aria-label", labelText);
 
             boardContainer.appendChild(square);
@@ -84,16 +109,19 @@ function createBoardGrid() {
     });
 }
 
-// Runs EVERY TURN to sync visual layout with engine state
+/* Syncs the visual board with the engine state.
+   Adds, removes, or animates disc elements to match the board array.
+   Called after every valid move. */
 function updateBoard(state) {
     const board = state.board;
     boardContainer.dataset.currentPlayer = state.currentPlayer;
 
-    // Always sweep out old move indicators before building the new turn view
     clearMoveHighlights();
     Array.from({length: 8}).forEach(function (ignore, row) {
         Array.from({length: 8}).forEach(function (ignore, col) {
-            const selector = `.square[data-row="${row}"][data-col="${col}"]`;
+            const selector = (
+                `.square[data-row="${row}"][data-col="${col}"]`
+            );
             let square = document.querySelector(selector);
             let cellValue = board[row][col];
             let disc = square.querySelector(".disc");
@@ -106,7 +134,6 @@ function updateBoard(state) {
                 } else if (!disc.classList.contains(cellValue)) {
                     disc.classList.remove("red", "blue");
                     disc.classList.add(cellValue);
-
                     disc.classList.add("flip-anim");
                     setTimeout(function () {
                         disc.classList.remove("flip-anim");
@@ -119,6 +146,9 @@ function updateBoard(state) {
     });
 }
 
+/* Updates scores, turn indicator, disc stacks, and the game over modal.
+   Shows the modal with the winner if the game has ended.
+   Displays a turn passed message if the current player has no moves. */
 function updateUI(state) {
     const scores = getScores(state.board);
     redScoreEl.textContent = scores.red;
@@ -140,7 +170,6 @@ function updateUI(state) {
 
         modalRedScore.textContent = scores.red;
         modalBlueScore.textContent = scores.blue;
-
         modal.classList.remove("hidden");
         playerTurnEl.textContent = "Game Over";
     } else {
@@ -152,12 +181,15 @@ function updateUI(state) {
             : "Blue"
         );
         if (state.status === "Passed") {
-            playerTurnEl.textContent = `Player ${colorStr} (Turn Passed!)`;
+            playerTurnEl.textContent = (
+                `Player ${colorStr} (Turn Passed!)`
+            );
         } else {
             playerTurnEl.textContent = `Player ${colorStr}'s Turn`;
         }
     }
 
+    /* Rebuild the disc stack bars to reflect remaining inventory. */
     redStackEl.innerHTML = "";
     blueStackEl.innerHTML = "";
 
@@ -172,13 +204,18 @@ function updateUI(state) {
     });
 }
 
-/* 4. Initial Setup Calls */
+/* 4. Initial Setup*/
+
 renderGridLines();
 createBoardGrid();
 updateBoard(gameState);
 updateUI(gameState);
 
-/* 5. Event Listeners & Loops */
+/* 5. Event Listeners */
+
+/* Handles clicking a square on the board.
+   Attempts to apply the move at that position.
+   Updates the board and UI if the move was legal. */
 boardContainer.addEventListener("click", function (event) {
     if (gameState.status === "GameOver") {
         return;
@@ -202,18 +239,23 @@ boardContainer.addEventListener("click", function (event) {
     updateUI(gameState);
 });
 
+/* Resets the game when the header restart button is clicked. */
 restartBtn.addEventListener("click", function () {
     gameState = initializeGame();
     updateBoard(gameState);
     updateUI(gameState);
 });
 
+/* Resets the game when the modal restart button is clicked
+   after a game over screen is shown. */
 modalRestartBtn.addEventListener("click", function () {
     gameState = initializeGame();
     updateBoard(gameState);
     updateUI(gameState);
 });
 
+/* Highlights all squares the current player can legally move to.
+   Places a dot inside each valid square.*/
 showMovesBtn.addEventListener("click", function () {
     if (gameState.status === "GameOver") {
         return;
@@ -227,11 +269,12 @@ showMovesBtn.addEventListener("click", function () {
     );
 
     validMoves.forEach(function ([row, col]) {
-        const selector = `.square[data-row="${row}"][data-col="${col}"]`;
+        const selector = (
+            `.square[data-row="${row}"][data-col="${col}"]`
+        );
         const square = document.querySelector(selector);
         if (square) {
             square.classList.add("hint");
-
             const dot = document.createElement("div");
             dot.classList.add("hint-dot");
             square.appendChild(dot);
@@ -239,7 +282,11 @@ showMovesBtn.addEventListener("click", function () {
     });
 });
 
-/* 6. Keyboard Accessibility Navigation Loop*/
+/* 6. Keyboard Accessibility*/
+
+/* Allows keyboard navigation across the board.
+   Arrow keys move focus between squares.
+   Enter or Space places a piece on the focused square. */
 boardContainer.addEventListener("keydown", function (event) {
     if (gameState.status === "GameOver") {
         return;
