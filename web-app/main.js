@@ -1,4 +1,4 @@
-/*jslint browser */
+/*jslint browser Proper One!!! */
 
 /*linted
  * main.js
