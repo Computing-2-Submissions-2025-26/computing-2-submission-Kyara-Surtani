@@ -6,11 +6,15 @@
   "main": "web-app/Module.js",
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "lint": "jslint web-app/othello.js"
+  },
   "dependencies": {
     "ramda": "^0.32.0"
   },
   "devDependencies": {
     "docdash": "^2.0.2",
-    "mocha": "^11.7.5"
+    "jslint": "^0.12.1",
+    "mocha": "^11.3.0"
   }
 }
