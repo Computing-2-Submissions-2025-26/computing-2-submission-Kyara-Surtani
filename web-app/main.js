@@ -1,12 +1,15 @@
 /*jslint browser */
 /*import R from "./ramda.js";*/
-import {
+import OthelloEngine from "./othello.js";
+
+// Destructure the functions out from the frozen default engine object
+const {
     initializeGame,
     applyMove,
     getScores,
     getWinner,
     findAllValidMoves
-} from "./othello.js";
+} = OthelloEngine;
 
 /* 1. HTML Element Selectors */
 const boardContainer = document.getElementById("game-board");
