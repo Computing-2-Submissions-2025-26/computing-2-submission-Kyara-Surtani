@@ -220,7 +220,7 @@ header {
         linear-gradient(to right, rgba(236, 233, 223, 0.15) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(236, 233, 223, 0.15) 1px, transparent 1px);
     background-size: calc(480px / 8) calc(480px / 8);
-    background-position: 40px 40px;
+    background-position: 38px 48px;
 }
 
 /* 5. Othello Discs (Game Pieces)*/

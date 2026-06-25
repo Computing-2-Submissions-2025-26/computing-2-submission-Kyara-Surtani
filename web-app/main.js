@@ -1,4 +1,5 @@
-import R from "./ramda.js";
+/*jslint browser */
+/*import R from "./ramda.js";*/
 import {
     initializeGame,
     applyMove,
@@ -45,7 +46,7 @@ function renderGridLines() {
 
 function clearMoveHighlights() {
     const highlightedSquares = document.querySelectorAll(".square.hint");
-    highlightedSquares.forEach(function (square){
+    highlightedSquares.forEach(function (square) {
         square.classList.remove("hint");
         const dot = square.querySelector(".hint-dot");
         if (dot) {
@@ -58,12 +59,9 @@ function clearMoveHighlights() {
 function createBoardGrid() {
     boardContainer.innerHTML = ""; // Clear it once
 
-    Array.from({ length: 8 }).forEach(function (_, row) {
-
-        Array.from({ length: 8 }).forEach(function (_, col) {
-
+    Array.from({length: 8}).forEach(function (ignore, row) {
+        Array.from({length: 8}).forEach(function (ignore, col) {
             const square = document.createElement("div");
-
             square.classList.add("square");
 
             square.dataset.row = row;
@@ -79,43 +77,44 @@ function createBoardGrid() {
             square.setAttribute("aria-label", labelText);
 
             boardContainer.appendChild(square);
-
         });
-
     });
-
 }
 
-
 // Runs EVERY TURN to sync visual layout with engine state
-Array.from({ length: 8 }).forEach(function (_, row) {
+function updateBoard(state) {
+    const board = state.board;
+    boardContainer.dataset.currentPlayer = state.currentPlayer;
 
-    Array.from({ length: 8 }).forEach(function (_, col) {
+    // Always sweep out old move indicators before building the new turn view
+    clearMoveHighlights();
+    Array.from({length: 8}).forEach(function (ignore, row) {
+        Array.from({length: 8}).forEach(function (ignore, col) {
+            const selector = `.square[data-row="${row}"][data-col="${col}"]`;
+            let square = document.querySelector(selector);
+            let cellValue = board[row][col];
+            let disc = square.querySelector(".disc");
 
-        let selector = ".square[data-row=\"" + row + "\"][data-col=\"" + col + "\"]";
-        let square = document.querySelector(selector);
-        let cellValue = board[row][col];
-        let disc = square.querySelector(".disc");
+            if (cellValue !== "") {
+                if (!disc) {
+                    disc = document.createElement("div");
+                    disc.classList.add("disc", cellValue);
+                    square.appendChild(disc);
+                } else if (!disc.classList.contains(cellValue)) {
+                    disc.classList.remove("red", "blue");
+                    disc.classList.add(cellValue);
 
-        if (cellValue !== "") {
-            if (!disc) {
-                disc = document.createElement("div");
-                disc.classList.add("disc", cellValue);
-                square.appendChild(disc);
-            } else if (!disc.classList.contains(cellValue)) {
-                disc.classList.remove("red", "blue");
-                disc.classList.add(cellValue);
-
-                disc.classList.add("flip-anim");
-                setTimeout(() => {
-                    disc.classList.remove("flip-anim");
-                }, 400);
+                    disc.classList.add("flip-anim");
+                    setTimeout(function () {
+                        disc.classList.remove("flip-anim");
+                    }, 400);
+                }
+            } else if (disc) {
+                square.removeChild(disc);
             }
-        } else if (disc) {
-            square.removeChild(disc);
-        }
+        });
     });
-});
+}
 
 function updateUI(state) {
     const scores = getScores(state.board);
@@ -128,7 +127,11 @@ function updateUI(state) {
         if (winner === "draw") {
             modalWinnerText.textContent = "It's a Draw!";
         } else {
-            const winColor = winner === "red" ? "Red" : "Blue";
+            let winColor = (
+                winner === "red"
+                ? "Red"
+                : "Blue"
+            );
             modalWinnerText.textContent = `${winColor} Wins!`;
         }
 
@@ -140,7 +143,11 @@ function updateUI(state) {
     } else {
         modal.classList.add("hidden");
 
-        const colorStr = state.currentPlayer === "red" ? "Red" : "Blue";
+        let colorStr = (
+            state.currentPlayer === "red"
+            ? "Red"
+            : "Blue"
+        );
         if (state.status === "Passed") {
             playerTurnEl.textContent = `Player ${colorStr} (Turn Passed!)`;
         } else {
@@ -151,20 +158,15 @@ function updateUI(state) {
     redStackEl.innerHTML = "";
     blueStackEl.innerHTML = "";
 
-Array.from({ length: state.inventory.red }).forEach(function () {
+    Array.from({length: state.inventory.red}).forEach(function () {
+        let bar = document.createElement("div");
+        redStackEl.appendChild(bar);
+    });
 
-    var bar = document.createElement("div");
-    redStackEl.appendChild(bar);
-
-});
-
-Array.from({ length: state.inventory.blue }).forEach(function () {
-
-    var bar = document.createElement("div");
-    blueStackEl.appendChild(bar);
-
-});
-    }
+    Array.from({length: state.inventory.blue}).forEach(function () {
+        let bar = document.createElement("div");
+        blueStackEl.appendChild(bar);
+    });
 }
 
 /* 4. Initial Setup Calls */
@@ -174,7 +176,7 @@ updateBoard(gameState);
 updateUI(gameState);
 
 /* 5. Event Listeners & Loops */
-boardContainer.addEventListener("click", (event) => {
+boardContainer.addEventListener("click", function (event) {
     if (gameState.status === "GameOver") {
         return;
     }
@@ -197,19 +199,19 @@ boardContainer.addEventListener("click", (event) => {
     updateUI(gameState);
 });
 
-restartBtn.addEventListener("click", () => {
+restartBtn.addEventListener("click", function () {
     gameState = initializeGame();
     updateBoard(gameState);
     updateUI(gameState);
 });
 
-modalRestartBtn.addEventListener("click", () => {
+modalRestartBtn.addEventListener("click", function () {
     gameState = initializeGame();
     updateBoard(gameState);
     updateUI(gameState);
 });
 
-showMovesBtn.addEventListener("click", () => {
+showMovesBtn.addEventListener("click", function () {
     if (gameState.status === "GameOver") {
         return;
     }
@@ -221,7 +223,7 @@ showMovesBtn.addEventListener("click", () => {
         gameState.currentPlayer
     );
 
-    validMoves.forEach(([row, col]) => {
+    validMoves.forEach(function ([row, col]) {
         const selector = `.square[data-row="${row}"][data-col="${col}"]`;
         const square = document.querySelector(selector);
         if (square) {
@@ -235,7 +237,7 @@ showMovesBtn.addEventListener("click", () => {
 });
 
 /* 6. Keyboard Accessibility Navigation Loop*/
-boardContainer.addEventListener("keydown", (event) => {
+boardContainer.addEventListener("keydown", function (event) {
     if (gameState.status === "GameOver") {
         return;
     }
@@ -248,53 +250,51 @@ boardContainer.addEventListener("keydown", (event) => {
     let row = parseInt(currentSquare.dataset.row, 10);
     let col = parseInt(currentSquare.dataset.col, 10);
     let targetSquare = null;
+    let sel;
+    let newState;
 
     switch (event.key) {
     case "ArrowUp":
         if (row > 0) {
-            const sel = `.square[data-row="${row - 1}"][data-col="${col}"]`;
+            sel = `.square[data-row="${row - 1}"][data-col="${col}"]`;
             targetSquare = document.querySelector(sel);
         }
         event.preventDefault();
         break;
     case "ArrowDown":
         if (row < 7) {
-            const sel = `.square[data-row="${row + 1}"][data-col="${col}"]`;
+            sel = `.square[data-row="${row + 1}"][data-col="${col}"]`;
             targetSquare = document.querySelector(sel);
         }
         event.preventDefault();
         break;
     case "ArrowLeft":
         if (col > 0) {
-            const sel = `.square[data-row="${row}"][data-col="${col - 1}"]`;
+            sel = `.square[data-row="${row}"][data-col="${col - 1}"]`;
             targetSquare = document.querySelector(sel);
         }
         event.preventDefault();
         break;
     case "ArrowRight":
         if (col < 7) {
-            const sel = `.square[data-row="${row}"][data-col="${col + 1}"]`;
+            sel = `.square[data-row="${row}"][data-col="${col + 1}"]`;
             targetSquare = document.querySelector(sel);
         }
         event.preventDefault();
         break;
-
     case "Enter":
     case " ":
         event.preventDefault();
-
-        const newState = applyMove(gameState, [row, col]);
+        newState = applyMove(gameState, [row, col]);
         if (newState !== gameState) {
             gameState = newState;
             updateBoard(gameState);
             updateUI(gameState);
-
-            setTimeout(() => {
+            setTimeout(function () {
                 currentSquare.focus();
             }, 50);
         }
         break;
-
     default:
         return;
     }
